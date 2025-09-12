@@ -1,0 +1,40 @@
+#lang racket/gui
+
+(define GRID 10)          ; 10x10
+(define CELL-SIZE 36)     ; tamaño de cada botón (px)
+
+(define frame
+  (new frame%
+       [label "Buscaminas — Grid 10x10"]
+       [width  (* GRID CELL-SIZE)]
+       [height (* GRID CELL-SIZE)]))
+
+;; Panel raíz en columnas/filas: usaremos 10 filas (vertical-panel%) y,
+;; dentro de cada fila, un horizontal-panel% con 10 botones.
+(define root
+  (new vertical-panel%
+       [parent frame]
+       [spacing 0]
+       [stretchable-width #f]
+       [stretchable-height #f]))
+
+(for ([r (in-range GRID)])
+  (define row
+    (new horizontal-panel%
+         [parent root]
+         [spacing 0]
+         [stretchable-width #f]
+         [stretchable-height #f]))
+  (for ([c (in-range GRID)])
+    (new button%
+         [parent row]
+         [label ""]                 ; sin texto por ahora
+         [min-width  CELL-SIZE]
+         [min-height CELL-SIZE]
+         [callback (λ (btn evt)
+                     ;; Aquí luego conectarás la lógica del juego.
+                     ;; Por ahora, solo mostramos la posición y marcamos el botón.
+                     (displayln (format "Click en (~a, ~a)" r c))
+                     (send btn set-label "•"))])))
+
+(send frame show #t)
