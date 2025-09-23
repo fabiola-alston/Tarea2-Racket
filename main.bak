@@ -1,20 +1,39 @@
 #lang racket/gui
 
-(define GRID 10)          ; 10x10
-(define CELL-SIZE 36)     ; tamaño de cada botón (px)
+; tamaño del grid (filas = columnas)
+(define GRID 10)
+; tamaño de cada botón (px)
+(define CELL 35)
+
+; ---------------------------
+; MATRIZ ASOCIADA AL GRID
+; mat : lista de listas (filas)
+; cada celda contiene su propia coordenada como lista '(r c)
+(define mat
+  (for/list ([r (in-range GRID)])
+    (for/list ([c (in-range GRID)])
+      (list r c))))
+
+; helper para leer un valor de la matriz (por si luego cambias la representación)
+(define (mat-ref m r c)
+  (list-ref (list-ref m r) c))
+
+; ---------------------------
+; UI
 
 (define frame
   (new frame%
-       [label "Buscaminas — Grid 10x10"]
-       [width  (* GRID CELL-SIZE)]
-       [height (* GRID CELL-SIZE)]))
+       [label "Minesweeper"]
+       [stretchable-width #f]
+       [stretchable-height #f]))
 
-;; Panel raíz en columnas/filas: usaremos 10 filas (vertical-panel%) y,
-;; dentro de cada fila, un horizontal-panel% con 10 botones.
+; panel raíz
 (define root
   (new vertical-panel%
        [parent frame]
        [spacing 0]
+       [horiz-margin 0]
+       [vert-margin 0]
        [stretchable-width #f]
        [stretchable-height #f]))
 
@@ -23,18 +42,30 @@
     (new horizontal-panel%
          [parent root]
          [spacing 0]
+         [horiz-margin 0]
+         [vert-margin 0]
          [stretchable-width #f]
          [stretchable-height #f]))
   (for ([c (in-range GRID)])
+    (define this-val (mat-ref mat r c)) ; valor vinculado a este botón
     (new button%
          [parent row]
-         [label ""]                 ; sin texto por ahora
-         [min-width  CELL-SIZE]
-         [min-height CELL-SIZE]
-         [callback (λ (btn evt)
-                     ;; Aquí luego conectarás la lógica del juego.
-                     ;; Por ahora, solo mostramos la posición y marcamos el botón.
-                     (displayln (format "Click en (~a, ~a)" r c))
-                     (send btn set-label "•"))])))
+         [label ""]  ; sin texto
 
+         ; mantener cuadrados
+         [min-width  CELL]
+         [min-height CELL]
+
+         ; no estirables
+         [stretchable-width #f]
+         [stretchable-height #f]
+
+         ; callback: imprime el valor de la matriz para este botón
+         [callback
+          (λ (_btn _evt)
+            (printf "Click en r=~a, c=~a -> valor: ~a\n"
+                    r c this-val)))])))
+
+; ajustar ventana (bordes mínimos)
+(send frame resize (+ 2 (* GRID CELL)) (+ 2 (* GRID CELL)))
 (send frame show #t)
