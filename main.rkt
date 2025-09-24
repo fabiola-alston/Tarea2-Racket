@@ -225,10 +225,10 @@
                (send btn is-enabled?)
                (not (flagged? r c))
                (begin
-                 (send btn set-label (choose has-mine? MINE-BMP CLEAR-BMP))
-                 (send btn enable #f)
+                 (send btn set-label (choose has-mine? MINE-BMP CLEAR-BMP)) ; logica: soy una mina ? soy roja. no soy una mina ? soy azul
+                 (send btn enable #f) ; descativa el boton al ser presionado
 
-                 ;; Derrota real (marca fin y deshabilita tablero)
+                 ;; Derrota  (marca fin y deshabilita tablero)
                  (and has-mine?
                       (begin
                         (set-box! GAME-ENDED? #t)
@@ -246,7 +246,7 @@
                (win?)
                (begin
                  (set-box! GAME-ENDED? #t)
-                 (message-box "¡Ganaste!" "¡Limpiaste el tablero!" frame '(ok)))))]))  ; <-- AQUÍ: ]))
+                 (message-box "¡Ganaste!" "¡Limpiaste el tablero!" frame '(ok)))))])) 
 
 ;; guarda el botón
 (hash-set! BTN-HASH (cons r c) btn)
