@@ -1,3 +1,4 @@
+
 #lang racket/gui
 (require racket/list
          racket/set)
@@ -32,44 +33,6 @@
      (define r (quotient i cols))
      (define c (remainder i cols))
      (cons r c)))) ; las guarda en un set de minas como un par ordenado
-
-; selección de dificultad (antes de generar minas)
-(define DIFFICULTIES
-  (list (list "Fácil"   0.10)
-        (list "Media"   0.15)
-        (list "Difícil" 0.25)))
-
-(define RANDOMIZE-DIFFICULTY? #f) ; si es true, elige al azar la dificultad
-
-(define (select-difficulty/dialog)
-  (define dlg (new dialog% [label "Selecciona dificultad"]))
-  (define vp  (new vertical-panel% [parent dlg] [horiz-margin 12] [vert-margin 12] [spacing 8]))
-  (new message% [parent vp] [label "Elige la dificultad:"])
-  (define rb (new radio-box% [parent vp] [choices (map first DIFFICULTIES)] [label ""]))
-  (send rb set-selection 1) ; preselecciona "Media"
-  (define bp (new horizontal-panel% [parent vp] [alignment '(right center)] [spacing 8]))
-  (new button% 
-     [parent bp] 
-     [label "OK"] 
-     [callback (lambda (_btn _evt) (send dlg show #f))])
-
-(new button% 
-     [parent bp] 
-     [label "Cancelar"] 
-     [callback (lambda (_btn _evt) (send dlg show #f))])
-
-  (send dlg show #t)
-  (list-ref DIFFICULTIES (send rb get-selection)))
-
-(define DIFF-CHOICE
-  (if RANDOMIZE-DIFFICULTY?
-      (list-ref DIFFICULTIES (random (length DIFFICULTIES)))
-      (select-difficulty/dialog)))
-
-(define CHOSEN-LABEL (first DIFF-CHOICE))
-(define CHOSEN-RATIO (second DIFF-CHOICE))
-(set! MINE-RATIO CHOSEN-RATIO)
-(set! MINE-COUNT (max 1 (inexact->exact (round (* ROWS COLS MINE-RATIO))))) ; recalcula según dificultad elegida
 
 ; aqui "setea" la generacion aleatoria de minas con esa funcion de arriba usando los datos reales del juego (rows columns etc)
 (define mine-set (random-mines ROWS COLS MINE-COUNT))
